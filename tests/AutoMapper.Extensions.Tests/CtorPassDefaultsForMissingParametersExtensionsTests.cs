@@ -93,7 +93,12 @@ public sealed class CtorPassDefaultsForMissingParametersExtensionsTests
 
         public struct ValueType
         {
-            public int A { get; set; } = 123;
+            public int A { get; set; }
+
+            public ValueType()
+            {
+                A = 123;
+            }
         }
     }
 }
