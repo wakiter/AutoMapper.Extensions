@@ -1,28 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AutoMapper.Extensions
 {
     public static class CtorPassDefaultsForMissingParametersExtensions
     {
-        public static IMappingExpression<TSource, TDestination> CtorPassDefaultsForMissingParameters<TSource, TDestination>(
-            this IMappingExpression<TSource, TDestination> mapping)
+        public static IMappingExpression CtorPassDefaultsForMissingParameters(this IMappingExpression mapping,
+            Type sourceType, Type destinationType)
         {
-            var destinationCtor = typeof(TDestination)
-                .GetConstructors()
-                .OrderByDescending(x => x.GetParameters().Length)
-                .First();
-
-            var sourceProperties = typeof(TSource)
-                .GetProperties()
-                .Where(x => x.CanRead);
-
-            var ctorParameters = destinationCtor.GetParameters();
-
-            var missingCtorParameters = ctorParameters
-                .Select(x => new {x.Name, Type = x.ParameterType})
-                .ExceptBy(sourceProperties.Select(k => k.Name), x => x.Name, StringComparer.InvariantCultureIgnoreCase)
-                .ToArray();
+            var missingCtorParameters = GetMissingCtorParameters(sourceType, destinationType);
 
             foreach (var missingCtorParameter in missingCtorParameters)
             {
@@ -33,12 +20,54 @@ namespace AutoMapper.Extensions
                 });
             }
 
-            object? GetDefaultValue(Type t)
+            return mapping;
+        }
+        
+        public static IMappingExpression<TSource, TDestination> CtorPassDefaultsForMissingParameters<TSource, TDestination>(
+            this IMappingExpression<TSource, TDestination> mapping)
+        {
+            var sourceType = typeof(TSource);
+            var destinationType = typeof(TDestination);
+
+            var missingCtorParameters = GetMissingCtorParameters(sourceType, destinationType);
+
+            foreach (var missingCtorParameter in missingCtorParameters)
             {
-                return t.IsValueType ? Activator.CreateInstance(t) : null;
+                mapping.ForCtorParam(missingCtorParameter.Name, cfg =>
+                {
+                    var defaultValue = GetDefaultValue(missingCtorParameter.Type);
+                    cfg.MapFrom((source, resolutionContext) => defaultValue);
+                });
             }
 
             return mapping;
         }
+
+        private static IEnumerable<(string Name, Type Type)> GetMissingCtorParameters(Type sourceType, Type destinationType)
+        {
+            var destinationCtor = destinationType
+                .GetConstructors()
+                .OrderByDescending(x => x.GetParameters().Length)
+                .First();
+
+            var sourceProperties = sourceType
+                .GetProperties()
+                .Where(x => x.CanRead);
+
+            var ctorParameters = destinationCtor.GetParameters();
+
+            var missingCtorParameters = ctorParameters
+                .Select(x => (x.Name, x.ParameterType))
+                .ExceptBy(sourceProperties.Select(k => k.Name), x => x.Name, StringComparer.InvariantCultureIgnoreCase)
+                .ToArray();
+
+            return missingCtorParameters;
+        }
+
+        private static object? GetDefaultValue(Type t)
+        {
+            return t.IsValueType ? Activator.CreateInstance(t) : null;
+        }
+
     }
 }

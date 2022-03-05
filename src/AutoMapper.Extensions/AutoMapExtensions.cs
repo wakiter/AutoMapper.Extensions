@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -17,46 +18,8 @@ namespace AutoMapper.Extensions
             {
                 return mappingExpression;
             }
-
-            foreach (var sourcePropertyInfo in sourceType.GetProperties().Where(x => !x.PropertyType.IsSystemType()))
-            {
-                var correspondingProperty = destinationType
-                    .GetProperties()
-                    .FirstOrDefault(p => p.Name == sourcePropertyInfo.Name && !p.PropertyType.IsSystemType());
-
-                if (correspondingProperty == null)
-                {
-                    continue;
-                }
-
-                if (sourcePropertyInfo.PropertyType.IsGenericType &&
-                    correspondingProperty.PropertyType.IsGenericType)
-                {
-                    var sourceGenericArguments = sourcePropertyInfo.PropertyType.GetGenericArguments();
-                    var destinationGenericArguments = correspondingProperty.PropertyType.GetGenericArguments();
-
-                    if (sourceGenericArguments.Length != destinationGenericArguments.Length)
-                    {
-                        throw new GenericArgumentsCountMismatch(sourceType, sourceGenericArguments, destinationType, destinationGenericArguments); 
-                    }
-
-                    for (int i = 0; i < sourceGenericArguments.Length; i++)
-                    {
-                        var sourceGenericArgument = sourceGenericArguments[i];
-                        var destinationGenericArgument = destinationGenericArguments[i];
-
-                        if (!sourceGenericArgument.IsSystemType() && !destinationGenericArgument.IsSystemType())
-                        {
-                            CreateAutoMap(mapperConfigurationExpression, sourceGenericArgument, destinationGenericArgument);
-                        }
-                    }
-
-                }
-                else if (sourcePropertyInfo.PropertyType.IsClass && correspondingProperty.PropertyType.IsClass)
-                {
-                    CreateAutoMap(mapperConfigurationExpression, sourcePropertyInfo.PropertyType, correspondingProperty.PropertyType);
-                }
-            }
+            
+            CreateAutoMapCommon(mapperConfigurationExpression, sourceType, destinationType, (mce, source, target) => CreateAutoMap(mce, source, target));
 
             return mappingExpression;
 
@@ -75,6 +38,17 @@ namespace AutoMapper.Extensions
                 return mappingExpression;
             }
 
+            CreateAutoMapCommon(mapperConfigurationExpression, sourceType, destinationType, InvokeCreateAutoMapGeneric);
+
+            return mappingExpression;
+        }
+
+        private static void CreateAutoMapCommon(
+            IMapperConfigurationExpression mapperConfigurationExpression,
+            Type sourceType,
+            Type destinationType,
+            Action<IMapperConfigurationExpression, Type, Type> recursiveInvocationAction)
+        {
             foreach (var sourcePropertyInfo in sourceType.GetProperties().Where(x => !x.PropertyType.IsSystemType()))
             {
                 var correspondingProperty = destinationType
@@ -104,18 +78,16 @@ namespace AutoMapper.Extensions
 
                         if (!sourceGenericArgument.IsSystemType() && !destinationGenericArgument.IsSystemType())
                         {
-                            InvokeCreateAutoMapGeneric(mapperConfigurationExpression, sourceGenericArgument, destinationGenericArgument);
+                            recursiveInvocationAction(mapperConfigurationExpression, sourceGenericArgument, destinationGenericArgument);
                         }
                     }
 
                 }
                 else if (sourcePropertyInfo.PropertyType.IsClass && correspondingProperty.PropertyType.IsClass)
                 {
-                    InvokeCreateAutoMapGeneric(mapperConfigurationExpression, sourcePropertyInfo.PropertyType, correspondingProperty.PropertyType);
+                    recursiveInvocationAction(mapperConfigurationExpression, sourcePropertyInfo.PropertyType, correspondingProperty.PropertyType);
                 }
             }
-
-            return mappingExpression;
         }
 
         private static void InvokeCreateAutoMapGeneric(
@@ -159,6 +131,7 @@ namespace AutoMapper.Extensions
                 .Invoke(null, new object[]{mapperConfigurationExpression});
         }
 
+        [ExcludeFromCodeCoverage]
         public sealed class CreateAutoMapGenericArgumentsCountMismatch : Exception
         {
             public CreateAutoMapGenericArgumentsCountMismatch(int expectedGenericParameters, int receivedGenericParameters)
@@ -167,6 +140,7 @@ namespace AutoMapper.Extensions
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public sealed class CreateAutMapGenericNotFound : Exception
         {
             public CreateAutMapGenericNotFound(int genericParameters)
@@ -175,6 +149,7 @@ namespace AutoMapper.Extensions
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public sealed class GenericArgumentsCountMismatch : Exception
         {
             public GenericArgumentsCountMismatch(Type sourceType, Type[] genericSourceTypeArguments, Type destinationType, Type[] genericDestinationTypeArguments)
