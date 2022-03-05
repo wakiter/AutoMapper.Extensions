@@ -1,4 +1,3 @@
-using System;
 using AutoFixture;
 using FluentAssertions;
 using Xunit;
@@ -18,8 +17,7 @@ public sealed class CtorPassDefaultsForMissingParametersExtensionsTests
         {
             cfg
                 .CreateAutoMap<SourceClass, DestinationClass>()
-            //.CtorPassDefaultsForMissingParameters()
-                .CtorMapParameter(x => x.PropF, cfg => cfg.MapFrom((source, resolution) => "aaaaa"));
+                .CtorPassDefaultsForMissingParameters();
         }).CreateMapper();
 
         var actual = sut.Map<DestinationClass>(input);
@@ -32,7 +30,7 @@ public sealed class CtorPassDefaultsForMissingParametersExtensionsTests
                 PropB = input.PropB,
                 PropC = default(bool),
                 PropD = default(decimal),
-                PropE = default(DestinationClass.ValueType)
+                PropE = new DestinationClass.ValueType()
             });
     }
 
@@ -49,21 +47,21 @@ public sealed class CtorPassDefaultsForMissingParametersExtensionsTests
 
         public int PropB { get; }
 
-        //public Boolean PropC { get; }
+        public bool PropC { get; }
+        
+        public decimal PropD { get; }
 
-        //public decimal PropD { get; }
-
-        //public ValueType PropE { get; }
+        public ValueType PropE { get; }
 
         public string PropF { get; }
 
-        public DestinationClass(string propA, int propB, /*DateTimeOffset propC,*/ /*decimal propD*//*, ValueType propE*/ string propF)
+        public DestinationClass(string propA, int propB, bool propC, decimal propD, ValueType propE, string propF)
         {
             PropA = propA;
             PropB = propB;
-            //PropC = propC;
-            //PropD = propD;
-            //PropE = propE;
+            PropC = propC;
+            PropD = propD;
+            PropE = propE;
             PropF = propF;
         }
 
