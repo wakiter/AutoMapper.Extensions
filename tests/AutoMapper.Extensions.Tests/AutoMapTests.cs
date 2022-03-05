@@ -52,6 +52,10 @@ public sealed class AutoMapTests
         actual.Should().BeEquivalentTo(input, opt => opt.Excluding(x => x.MissingPropertyInDestinationObject));
     }
 
+    private sealed class CommonTypeForBothSides
+    {
+    }
+
     private sealed class AutoMapTestRootSource
     {
         public string PropA { get; set; }
@@ -75,6 +79,8 @@ public sealed class AutoMapTests
         public IEnumerable<int> MissingPropertyInDestinationObject { get; set; }
 
         public IDictionary<string, AutoMapSubClassA> PropJ { get; set; }
+
+        public CommonTypeForBothSides PropK { get; set; }
 
         public sealed class AutoMapSubClassA
         {
@@ -121,6 +127,8 @@ public sealed class AutoMapTests
         public IEnumerable<int> MissingPropertyInSourceObject { get; set; }
 
         public IDictionary<string, AutoMapSubClassA> PropJ { get; set; }
+
+        public CommonTypeForBothSides PropK { get; set; }
 
         public sealed class AutoMapSubClassA
         {

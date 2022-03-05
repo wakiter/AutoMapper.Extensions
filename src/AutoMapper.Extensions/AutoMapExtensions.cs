@@ -98,22 +98,13 @@ namespace AutoMapper.Extensions
             var genericArgumentTypes = new[] { sourceType, destinationType };
             var openGenericCreateAutoMapMethod = typeof(AutoMapExtensions)
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Where(x => x.Name == nameof(CreateAutoMap))
                 .Where(x =>
                 {
-                    if (x.Name != nameof(CreateAutoMap))
-                    {
-                        return false;
-                    }
-
                     var genericArguments = x.GetGenericArguments();
                     if (genericArguments.Length == 0)
                     {
                         return false;
-                    }
-
-                    if (genericArguments.Length != genericArgumentTypes.Length)
-                    {
-                        throw new CreateAutoMapGenericArgumentsCountMismatch(genericArguments.Length, genericArgumentTypes.Length);
                     }
 
                     return true;
@@ -131,16 +122,6 @@ namespace AutoMapper.Extensions
                 .Invoke(null, new object[]{mapperConfigurationExpression});
         }
 
-        [ExcludeFromCodeCoverage]
-        public sealed class CreateAutoMapGenericArgumentsCountMismatch : Exception
-        {
-            public CreateAutoMapGenericArgumentsCountMismatch(int expectedGenericParameters, int receivedGenericParameters)
-                : base($"{nameof(CreateAutoMap)} expects {expectedGenericParameters} parameters, but received {receivedGenericParameters}!")
-            {
-            }
-        }
-
-        [ExcludeFromCodeCoverage]
         public sealed class CreateAutMapGenericNotFound : Exception
         {
             public CreateAutMapGenericNotFound(int genericParameters)
@@ -149,7 +130,6 @@ namespace AutoMapper.Extensions
             }
         }
 
-        [ExcludeFromCodeCoverage]
         public sealed class GenericArgumentsCountMismatch : Exception
         {
             public GenericArgumentsCountMismatch(Type sourceType, Type[] genericSourceTypeArguments, Type destinationType, Type[] genericDestinationTypeArguments)
