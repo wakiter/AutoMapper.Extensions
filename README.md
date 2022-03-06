@@ -5,7 +5,7 @@ An extension library for AutoMapper that brings back automatic mapping creation,
 AutoMapper is a brilliant and powerfull tool. But even though, it has its own isseus and missing functionalities. If you want to follow zero friction theorem, AutoMapper can bring you closer to it. With creation of automated mapping, ignoring missing constructor parameters and strongly-typed constructor parameters (instead of using string value) you can create a better, more robust and requiring less maintenance code.
 
 ## Overview
-This library was intended to restore automatic creation of AutoMapper mappings. If you have nested types, just use extension method `.CreateAutoMap<TSource, TDestination>()` or `.CreateAutoMap(typeof(TSource), typeof(TDestination))` and all types used in those class will be automatically mapped. 
+This library was intended to restore automatic creation of AutoMapper mappings. If you have nested types, just use extension method `.CreateAutoMap<TSource, TDestination>()` or `.CreateAutoMap(typeof(TSource), typeof(TDestination))` and all types used in those classes will be automatically mapped. 
 
 If you want to pass default type values for destination type constructor, use `.CtorPassDefaultsForMissingParameters()` or `.CtorPassDefaultsForMissingParameters(typeof(TSource), typeof(TDestination))`.
 
