@@ -82,6 +82,8 @@ public sealed class AutoMapTests
 
         public CommonTypeForBothSides PropK { get; set; }
 
+        public AutoMapSubEnumA PropL { get; set; }
+
         public sealed class AutoMapSubClassA
         {
             public string PropAOfAutoMapSubClassA { get; set; }
@@ -101,6 +103,13 @@ public sealed class AutoMapTests
             public string PropAOfAutoMapSubClassB { get; set; }
 
             public int PropBOfAutoMapSubClassB { get; set; }
+        }
+
+        public enum AutoMapSubEnumA
+        {
+            None = 0,
+            A = 1,
+            B = 2
         }
     }
 
@@ -130,6 +139,8 @@ public sealed class AutoMapTests
 
         public CommonTypeForBothSides PropK { get; set; }
 
+        public AutoMapSubEnumA PropL { get; set; }
+
         public sealed class AutoMapSubClassA
         {
             public string PropAOfAutoMapSubClassA { get; set; }
@@ -149,6 +160,12 @@ public sealed class AutoMapTests
             public string PropAOfAutoMapSubClassB { get; set; }
 
             public int PropBOfAutoMapSubClassB { get; set; }
+        }
+
+        public enum AutoMapSubEnumA
+        {
+            A,
+            B
         }
     }
 }

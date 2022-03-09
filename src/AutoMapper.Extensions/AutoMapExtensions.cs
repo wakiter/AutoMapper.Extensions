@@ -49,11 +49,13 @@ namespace AutoMapper.Extensions
             Type destinationType,
             Action<IMapperConfigurationExpression, Type, Type> recursiveInvocationAction)
         {
-            foreach (var sourcePropertyInfo in sourceType.GetProperties().Where(x => !x.PropertyType.IsSystemType()))
+            foreach (var sourcePropertyInfo in sourceType
+                         .GetProperties()
+                         .Where(x => !x.PropertyType.IsSystemType() && !x.PropertyType.IsEnum))
             {
                 var correspondingProperty = destinationType
                     .GetProperties()
-                    .FirstOrDefault(p => p.Name == sourcePropertyInfo.Name && !p.PropertyType.IsSystemType());
+                    .FirstOrDefault(p => p.Name == sourcePropertyInfo.Name && !p.PropertyType.IsSystemType() && !p.PropertyType.IsEnum);
 
                 if (correspondingProperty == null)
                 {
@@ -76,7 +78,10 @@ namespace AutoMapper.Extensions
                         var sourceGenericArgument = sourceGenericArguments[i];
                         var destinationGenericArgument = destinationGenericArguments[i];
 
-                        if (!sourceGenericArgument.IsSystemType() && !destinationGenericArgument.IsSystemType())
+                        if (!sourceGenericArgument.IsSystemType() 
+                            && !sourceGenericArgument.IsEnum
+                            && !destinationGenericArgument.IsSystemType()
+                            && !destinationGenericArgument.IsEnum)
                         {
                             recursiveInvocationAction(mapperConfigurationExpression, sourceGenericArgument, destinationGenericArgument);
                         }
