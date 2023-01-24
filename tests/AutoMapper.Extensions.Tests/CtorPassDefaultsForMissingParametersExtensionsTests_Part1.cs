@@ -4,7 +4,7 @@ using Xunit;
 
 namespace AutoMapper.Extensions.Tests;
 
-public sealed class CtorPassDefaultsForMissingParametersExtensionsTests
+public sealed class CtorPassDefaultsForMissingParametersExtensionsTests_Part1
 {
     private readonly IFixture _fixture = new Fixture();
 

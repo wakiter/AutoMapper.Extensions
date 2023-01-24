@@ -23,7 +23,7 @@ public sealed class ConverterFromSourceToDestination
 	{
 		cfg
 			.CreateAutoMap<TSource, TDestination>() //this will create a map for those two mentioned types and all types they use for properties
-			.CtorPassDefaultsForMissingParameters() //this will pass default parameters for TDestination constructor 
+			.CtorPassDefaultsForMissingParameters() //this will pass default parameters for TDestination constructor  and descendants if combined with CreateAutoMap
 			.CtorMapParameter(x => x.Parameter, fixedValue) //this will pass an object with name fixedValue as a parameter for constructor parameter with a name that matches `Parameter`
 			.CtorMapParameter(x => x.OtherParameter, paramCfg => paramCfg.MapFrom((...))); //this will allow you to create custom configuration for constructor parameter but using strongly-typed way and not magic strings
 	});
