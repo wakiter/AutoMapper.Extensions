@@ -20,7 +20,7 @@ namespace AutoMapper.Extensions
                 return mappingExpression;
             }
             
-            CreateAutoMapForAllComplexProperties(mapperConfigurationExpression, new TypePair(sourceType, destinationType), new TypePair(typeof(void), typeof(void)), null);
+            CreateAutoMapForAllComplexProperties(mapperConfigurationExpression, new TypePair(sourceType, destinationType));
 
             return mappingExpression;
 
@@ -32,14 +32,10 @@ namespace AutoMapper.Extensions
             var sourceType = typeof(TSource);
             var destinationType = typeof(TDestination);
 
-            return mapperConfigurationExpression.CreateAutomaticMap<TSource, TDestination>(new TypePair(sourceType, destinationType), new TypePair(typeof(void), typeof(void)), null);
+            return mapperConfigurationExpression.CreateAutomaticMap<TSource, TDestination>(new TypePair(sourceType, destinationType));
         }
 
-        private static IMappingExpression CreateAutoMap(
-            this IMapperConfigurationExpression mapperConfigurationExpression,
-            TypePair conversionPair,
-            TypePair parentPair,
-            IAmAutoMappingExpression parentMappingExpression)
+        private static IMappingExpression CreateAutoMap(this IMapperConfigurationExpression mapperConfigurationExpression, TypePair conversionPair)
         {
             var mappingExpression = mapperConfigurationExpression.CreateMap(conversionPair.SourceType, conversionPair.DestinationType);
 
@@ -48,37 +44,33 @@ namespace AutoMapper.Extensions
                 return mappingExpression;
             }
 
-            CreateAutoMapForAllComplexProperties(mapperConfigurationExpression, conversionPair, parentPair, null); //todo: this null shouldn't be here! it's temporary to check generic version only!
+            CreateAutoMapForAllComplexProperties(mapperConfigurationExpression, conversionPair);
 
             return mappingExpression;
         }
 
         private static IMappingExpression<TSource, TDestination> CreateAutomaticMap<TSource, TDestination>(
             this IMapperConfigurationExpression mapperConfigurationExpression, 
-            TypePair conversionPair,
-            TypePair parentPair, 
-            IAmAutoMappingExpression parentMappingExpression)
+            TypePair conversionPair)
         {
-            return (IMappingExpression<TSource, TDestination>)mapperConfigurationExpression.CreateAutomaticMappingExpression(conversionPair, parentPair, parentMappingExpression);
+            return (IMappingExpression<TSource, TDestination>)mapperConfigurationExpression.CreateAutomaticMappingExpression(conversionPair);
         }
 
         private static IAmAutoMappingExpression CreateAutomaticMappingExpression(
             this IMapperConfigurationExpression mapperConfigurationExpression,
-            TypePair conversionPair,
-            TypePair parentPair,
-            IAmAutoMappingExpression parentMappingExpression)
+            TypePair conversionPair)
         {
             var profileConfiguration = (IProfileConfiguration)mapperConfigurationExpression;
             var typeMapConfiguration = (IList<ITypeMapConfiguration>)profileConfiguration.TypeMapConfigs;
 
-            var autoMappingExpression = CreateAutoMappingExpression(conversionPair, parentPair, parentMappingExpression);
+            var autoMappingExpression = CreateAutoMappingExpression(conversionPair);
 
             typeMapConfiguration.Add(autoMappingExpression);
 
             if (conversionPair.SourceType == conversionPair.DestinationType)
                 return autoMappingExpression;
 
-            var subMaps = CreateAutoMapForAllComplexProperties(mapperConfigurationExpression, conversionPair, parentPair, autoMappingExpression);
+            var subMaps = CreateAutoMapForAllComplexProperties(mapperConfigurationExpression, conversionPair);
 
             autoMappingExpression.AddChildrenMappingExpressions(subMaps);
 
@@ -87,9 +79,7 @@ namespace AutoMapper.Extensions
 
         private static IEnumerable<IAmAutoMappingExpression> CreateAutoMapForAllComplexProperties(
             IMapperConfigurationExpression mapperConfigurationExpression,
-            TypePair conversionPair,
-            TypePair parentPair,
-            IAmAutoMappingExpression parentMappingExpression)
+            TypePair conversionPair)
         {
             var retVal = new List<IAmAutoMappingExpression>();
 
@@ -127,7 +117,7 @@ namespace AutoMapper.Extensions
                             && !destinationGenericArgument.IsSystemType()
                             && !destinationGenericArgument.IsEnum)
                         {
-                            var mappingExpForSubProperty = mapperConfigurationExpression.CreateAutomaticMappingExpression(new TypePair(sourceGenericArgument, destinationGenericArgument), conversionPair, parentMappingExpression);
+                            var mappingExpForSubProperty = mapperConfigurationExpression.CreateAutomaticMappingExpression(new TypePair(sourceGenericArgument, destinationGenericArgument));
                             retVal.Add(mappingExpForSubProperty);
                         }
                     }
@@ -135,7 +125,7 @@ namespace AutoMapper.Extensions
                 }
                 else if (sourcePropertyInfo.PropertyType.IsClass && correspondingProperty.PropertyType.IsClass)
                 {
-                    var mappingExpForSubProperty = mapperConfigurationExpression.CreateAutomaticMappingExpression(new TypePair(sourcePropertyInfo.PropertyType, correspondingProperty.PropertyType), conversionPair, parentMappingExpression);
+                    var mappingExpForSubProperty = mapperConfigurationExpression.CreateAutomaticMappingExpression(new TypePair(sourcePropertyInfo.PropertyType, correspondingProperty.PropertyType));
                     retVal.Add(mappingExpForSubProperty);
                 }
             }
@@ -143,13 +133,12 @@ namespace AutoMapper.Extensions
             return retVal;
         }
 
-        private static IAmAutoMappingExpression CreateAutoMappingExpression(TypePair conversionPair,
-            TypePair parentPair, IAmAutoMappingExpression parentMappingExpression)
+        private static IAmAutoMappingExpression CreateAutoMappingExpression(TypePair conversionPair)
         {
             var openGenericType = typeof(AutoMappingExpression<,>);
             var closedGenericType = openGenericType.MakeGenericType(conversionPair.SourceType, conversionPair.DestinationType);
 
-            var instance = (IAmAutoMappingExpression)Activator.CreateInstance(closedGenericType, conversionPair, parentPair, parentMappingExpression);
+            var instance = (IAmAutoMappingExpression)Activator.CreateInstance(closedGenericType, conversionPair);
 
             return instance;
         }

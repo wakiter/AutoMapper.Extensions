@@ -9,22 +9,15 @@ namespace AutoMapper.Extensions
     {
         private readonly List<IAmAutoMappingExpression> _childrenMappingExpression = new List<IAmAutoMappingExpression>();
 
-        public TypePair ParentPair { get; }
         public TypePair ConversionPair { get; }
-        public IAmAutoMappingExpression ParentMappingExpression { get; }
         public IReadOnlyCollection<IAmAutoMappingExpression> ChildrenMappingExpression => _childrenMappingExpression;
 
-        public AutoMappingExpression(
-            TypePair conversionPair,
-            TypePair parentPair,
-            IAmAutoMappingExpression parentMappingExpression)
+        public AutoMappingExpression(TypePair conversionPair)
             : base(
                 MemberList.Destination,
                 false)
         {
-            ParentPair = parentPair;
             ConversionPair = conversionPair;
-            ParentMappingExpression = parentMappingExpression;
         }
 
         public IAmAutoMappingExpression AddChildrenMappingExpressions(IEnumerable<IAmAutoMappingExpression> children)
@@ -33,6 +26,5 @@ namespace AutoMapper.Extensions
 
             return this;
         }
-
     }
 }
