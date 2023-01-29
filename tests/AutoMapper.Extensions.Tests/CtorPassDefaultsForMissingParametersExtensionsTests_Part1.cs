@@ -33,33 +33,7 @@ public sealed class CtorPassDefaultsForMissingParametersExtensionsTests_Part1
                 PropE = new DestinationClass.ValueType()
             });
     }
-
-    [Fact]
-    public void Mapper_passes_default_values_for_missing_arguments_for_a_non_generic_map()
-    {
-        var input = _fixture.Create<SourceClass>();
-
-        var sut = new MapperConfiguration(cfg =>
-        {
-            cfg
-                .CreateAutoMap(typeof(SourceClass), typeof(DestinationClass))
-                .CtorPassDefaultsForMissingParameters(typeof(SourceClass), typeof(DestinationClass));
-        }).CreateMapper();
-
-        var actual = sut.Map<DestinationClass>(input);
-
-        actual
-            .Should()
-            .BeEquivalentTo(new
-            {
-                PropA = input.PropA,
-                PropB = input.PropB,
-                PropC = default(bool),
-                PropD = default(decimal),
-                PropE = new DestinationClass.ValueType()
-            });
-    }
-
+    
     private sealed class SourceClass
     {
         public string PropA { get; set; }

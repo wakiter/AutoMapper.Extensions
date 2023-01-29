@@ -8,24 +8,6 @@ namespace AutoMapper.Extensions
 {
     public static class AutoMapExtensions
     {
-        public static IMappingExpression CreateAutoMap(
-            this IMapperConfigurationExpression mapperConfigurationExpression,
-            Type sourceType, 
-            Type destinationType)
-        {
-            var mappingExpression = mapperConfigurationExpression.CreateMap(sourceType, destinationType);
-
-            if (sourceType == destinationType)
-            {
-                return mappingExpression;
-            }
-            
-            CreateAutoMapForAllComplexProperties(mapperConfigurationExpression, new TypePair(sourceType, destinationType));
-
-            return mappingExpression;
-
-        }
-
         public static IMappingExpression<TSource, TDestination> CreateAutoMap<TSource, TDestination>(
             this IMapperConfigurationExpression mapperConfigurationExpression)
         {
@@ -141,14 +123,6 @@ namespace AutoMapper.Extensions
             var instance = (IAmAutoMappingExpression)Activator.CreateInstance(closedGenericType, conversionPair);
 
             return instance;
-        }
-
-        public sealed class CreateAutMapGenericNotFound : Exception
-        {
-            public CreateAutMapGenericNotFound(int genericParameters)
-            : base($"Unable to find method {nameof(CreateAutoMap)} with {genericParameters} generic arguments!")
-            {
-            }
         }
 
         public sealed class GenericArgumentsCountMismatch : Exception

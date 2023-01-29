@@ -105,34 +105,6 @@ public class CtorPassDefaultsForMissingParametersExtensionsTests_Part2
     }
 
     [Fact]
-    public void Mapper_passes_default_values_for_missing_arguments_for_autoMap_nonGeneric_with_complex_property_with_missing_ctor_parameters()
-    {
-        var fixture = new Fixture();
-
-        var sut = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<Source, Destination>();
-
-            cfg.CreateAutoMap(typeof(UpsertJobOffer), typeof(JobOffer))
-                .CtorPassDefaultsForMissingParameters(typeof(UpsertJobOffer), typeof(JobOffer));
-
-        }).CreateMapper();
-
-        var input = fixture.Create<UpsertJobOffer>();
-
-        var actual = sut.Map<JobOffer>(input);
-
-        actual
-            .Should()
-            .BeEquivalentTo(new
-            {
-                Id = 0,
-                PositionName = input.PositionName,
-                CompanyDetailsProp = new { Name = input.CompanyDetailsProp.Name, Uri = input.CompanyDetailsProp.Uri,  }
-            });
-    }
-
-    [Fact]
     public void Mapper_passes_default_values_for_missing_arguments_for_normal_map()
     {
         var fixture = new Fixture();
