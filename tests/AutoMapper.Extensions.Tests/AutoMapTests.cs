@@ -37,21 +37,6 @@ public sealed class AutoMapTests
         actual.Should().BeEquivalentTo(input, opt => opt.Excluding(x => x.MissingPropertyInDestinationObject));
     }
 
-    [Fact]
-    public void CreateAutoMap_non_generic_creates_the_proper_map()
-    {
-        var input = _fixture.Create<AutoMapTestRootSource>();
-
-        var sut = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateAutoMap(typeof(AutoMapTestRootSource), typeof(AutoMapTestRootDestination));
-        }).CreateMapper();
-
-        var actual = sut.Map<AutoMapTestRootDestination>(input);
-
-        actual.Should().BeEquivalentTo(input, opt => opt.Excluding(x => x.MissingPropertyInDestinationObject));
-    }
-
     private sealed class CommonTypeForBothSides
     {
     }
