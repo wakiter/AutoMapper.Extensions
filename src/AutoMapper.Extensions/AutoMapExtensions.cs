@@ -17,20 +17,6 @@ namespace AutoMapper.Extensions
             return mapperConfigurationExpression.CreateAutomaticMap<TSource, TDestination>(new TypePair(sourceType, destinationType));
         }
 
-        private static IMappingExpression CreateAutoMap(this IMapperConfigurationExpression mapperConfigurationExpression, TypePair conversionPair)
-        {
-            var mappingExpression = mapperConfigurationExpression.CreateMap(conversionPair.SourceType, conversionPair.DestinationType);
-
-            if (conversionPair.SourceType == conversionPair.DestinationType)
-            {
-                return mappingExpression;
-            }
-
-            CreateAutoMapForAllComplexProperties(mapperConfigurationExpression, conversionPair);
-
-            return mappingExpression;
-        }
-
         private static IMappingExpression<TSource, TDestination> CreateAutomaticMap<TSource, TDestination>(
             this IMapperConfigurationExpression mapperConfigurationExpression, 
             TypePair conversionPair)

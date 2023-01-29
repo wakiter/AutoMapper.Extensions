@@ -8,29 +8,10 @@ namespace AutoMapper.Extensions
 {
     public static class CtorPassDefaultsForMissingParametersExtensions
     {
-        public static IMappingExpression CtorPassDefaultsForMissingParameters(this IMappingExpression mapping,
-            Type sourceType, Type destinationType)
-        {
-            var missingCtorParameters = GetMissingCtorParameters(sourceType, destinationType);
-
-            foreach (var missingCtorParameter in missingCtorParameters)
-            {
-                mapping.ForCtorParam(missingCtorParameter.Name, cfg =>
-                {
-                    var defaultValue = GetDefaultValue(missingCtorParameter.Type);
-                    cfg.MapFrom((source, resolutionContext) => defaultValue);
-                });
-            }
-
-            return mapping;
-        }
-        
         public static IMappingExpression<TSource, TDestination> CtorPassDefaultsForMissingParameters<TSource, TDestination>(
             this IMappingExpression<TSource, TDestination> mapping)
         {
-            var autoMappingExpression = mapping as IAmAutoMappingExpression;
-
-            if (autoMappingExpression != null)
+            if (mapping is IAmAutoMappingExpression autoMappingExpression)
             {
                 SetupCtorPassDefaultsForMissingParameters(autoMappingExpression);
             }
